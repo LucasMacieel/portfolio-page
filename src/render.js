@@ -31,10 +31,6 @@ export function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (char) => HTML_ESCAPE_MAP[char]);
 }
 
-/**
- * @param {string} url
- * @returns {string}
- */
 function sanitizeUrl(url) {
   const trimmed = String(url ?? '').trim();
   if (/^(https?:\/\/|mailto:|#|\/)/i.test(trimmed)) {

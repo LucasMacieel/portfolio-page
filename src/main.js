@@ -30,7 +30,6 @@ function resolveInitialTheme() {
       return saved;
     }
   } catch {
-    // Ignore storage access restrictions.
   }
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
@@ -42,7 +41,6 @@ function applyTheme(theme, persist = false) {
     try {
       localStorage.setItem(THEME_STORAGE_KEY, state.theme);
     } catch {
-      // Ignore storage access restrictions.
     }
   }
   const toggleButton = document.getElementById('theme-toggle');
