@@ -36,7 +36,6 @@ export function BrandMark() {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <circle cx={26} cy={6.25} r={1.75} fill="var(--metric)" />
     </svg>
   );
 }
