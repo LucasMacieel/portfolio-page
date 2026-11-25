@@ -1,4 +1,5 @@
 import {
+  buildGmailComposeUrl,
   sanitizeUrl,
   type ExperienceItem,
   type MetricItem,
@@ -30,7 +31,7 @@ const LIST_CLASS = 'grid list-disc gap-[0.45rem] pl-[1.15rem] text-[0.9375rem] t
 export function HeroSection({ profile }: { readonly profile: ProfileData }) {
   const githubUrl = sanitizeUrl(profile.links.github);
   const linkedinUrl = sanitizeUrl(profile.links.linkedin);
-  const mailHref = sanitizeUrl(`mailto:${profile.email}`);
+  const mailHref = sanitizeUrl(buildGmailComposeUrl(profile.email));
 
   return (
     <section id="hero-root" className="pt-4 pb-8" aria-label="Introduction">
@@ -71,7 +72,12 @@ export function HeroSection({ profile }: { readonly profile: ProfileData }) {
               <span>LinkedIn</span>
               <ArrowUpRightIcon />
             </a>
-            <a className={BUTTON_CLASSES.ghost} href={mailHref}>
+            <a
+              className={BUTTON_CLASSES.ghost}
+              href={mailHref}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <MailIcon />
               <span>Email</span>
             </a>
@@ -306,7 +312,7 @@ export function CredentialsSection({ profile }: { readonly profile: ProfileData 
 }
 
 export function ContactSection({ profile }: { readonly profile: ProfileData }) {
-  const mailHref = sanitizeUrl(`mailto:${profile.email}`);
+  const mailHref = sanitizeUrl(buildGmailComposeUrl(profile.email));
   const githubUrl = sanitizeUrl(profile.links.github);
   const linkedinUrl = sanitizeUrl(profile.links.linkedin);
 
@@ -321,7 +327,12 @@ export function ContactSection({ profile }: { readonly profile: ProfileData }) {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <a className={BUTTON_CLASSES.primary} href={mailHref}>
+            <a
+              className={BUTTON_CLASSES.primary}
+              href={mailHref}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <MailIcon />
               <span>{profile.email}</span>
             </a>

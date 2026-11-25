@@ -8,6 +8,7 @@ import { SiteHeader } from '@/components/site-header';
 import {
   PROFILE,
   PROJECT_CATEGORIES,
+  buildGmailComposeUrl,
   filterProjects,
   getCategoryLabel,
   normalizeCategory,
@@ -129,6 +130,13 @@ describe('Portfolio helpers', () => {
     expect(sanitizeUrl('')).toBe('#');
   });
 
+  it('builds a pre-addressed Gmail compose URL and trims whitespace', () => {
+    const expected =
+      'https://mail.google.com/mail/?view=cm&fs=1&to=lucasmacieelsousa%40gmail.com';
+    expect(buildGmailComposeUrl('lucasmacieelsousa@gmail.com')).toBe(expected);
+    expect(buildGmailComposeUrl('  lucasmacieelsousa@gmail.com  ')).toBe(expected);
+  });
+
   it('normalizes categories and falls back to all for unknown values', () => {
     expect(normalizeCategory('all')).toBe('all');
     expect(normalizeCategory('ai')).toBe('ai');
@@ -213,6 +221,26 @@ describe('Portfolio UI behavior', () => {
       screen.getByRole('heading', { level: 2, name: 'Education and credentials' })
     ).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 2, name: 'Contact' })).toBeInTheDocument();
+  });
+
+  it('opens Gmail compose drafts in a new tab for both email links and uses no mailto links', () => {
+    render(<HomePage />);
+
+    const expectedHref =
+      'https://mail.google.com/mail/?view=cm&fs=1&to=lucasmacieelsousa%40gmail.com';
+    const heroEmailLink = screen.getByRole('link', { name: 'Email' });
+    const contactEmailLink = screen.getByRole('link', { name: PROFILE.email });
+
+    for (const link of [heroEmailLink, contactEmailLink]) {
+      expect(link).toHaveAttribute('href', expectedHref);
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    }
+
+    const allLinks = screen.getAllByRole('link');
+    for (const link of allLinks) {
+      expect(link.getAttribute('href') ?? '').not.toMatch(/^mailto:/i);
+    }
   });
 
   it('filters projects by category and updates live status', () => {

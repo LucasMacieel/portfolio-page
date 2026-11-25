@@ -122,6 +122,16 @@ export function sanitizeUrl(url: string): string {
   return '#';
 }
 
+export function buildGmailComposeUrl(email: string): string {
+  const url = new URL('https://mail.google.com/mail/');
+  url.search = new URLSearchParams({
+    view: 'cm',
+    fs: '1',
+    to: email.trim(),
+  }).toString();
+  return url.toString();
+}
+
 export const PROFILE = Object.freeze({
   name: 'Lucas Maciel',
   initials: 'LM',
