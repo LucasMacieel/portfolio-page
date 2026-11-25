@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lucas Maciel | Full-Stack Engineer &amp; Applied AI Researcher</title>
+    <meta
+      name="description"
+      content="Portfolio of Lucas Maciel, Full-Stack Engineer at Projeto CIn/Motorola and MSc student in Computational Intelligence at Universidade de Pernambuco."
+    />
+    <meta property="og:title" content="Lucas Maciel | Full-Stack Engineer &amp; Applied AI Researcher" />
+    <meta
+      property="og:description"
+      content="Production AI systems, Google ADK agents, BigQuery and Vertex AI pipelines, web performance engineering, and 2026 research publications."
+    />
+    <meta property="og:type" content="website" />
+    <script>
+      (function () {
+        var theme = 'light';
+        try {
+          var saved = localStorage.getItem('portfolio-theme');
+          if (saved === 'dark' || saved === 'light') {
+            theme = saved;
+          } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            theme = 'dark';
+          }
+        } catch (err) {
+          if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            theme = 'dark';
+          }
+        }
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles/tokens.css" />
+    <link rel="stylesheet" href="./styles/main.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="#hero-root">
+          <span class="brand-mark" aria-hidden="true">LM</span>
+          <span>Lucas Maciel</span>
+        </a>
+
+        <div class="header-controls">
+          <nav id="nav-drawer" class="site-nav" aria-label="Primary navigation">
+            <a class="nav-link" href="#work">Systems</a>
+            <a class="nav-link" href="#research">Research</a>
+            <a class="nav-link" href="#experience">Experience</a>
+            <a class="nav-link" href="#credentials">Credentials</a>
+            <a class="nav-link" href="#contact">Contact</a>
+          </nav>
+
+          <button
+            id="theme-toggle"
+            class="theme-toggle"
+            type="button"
+            aria-pressed="false"
+            aria-label="Switch to dark theme"
+          >
+            <svg
+              class="icon-moon"
+              viewBox="0 0 24 24"
+              width="15"
+              height="15"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+            </svg>
+            <svg
+              class="icon-sun"
+              viewBox="0 0 24 24"
+              width="15"
+              height="15"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 2v2" />
+              <path d="M12 20v2" />
+              <path d="m4.93 4.93 1.41 1.41" />
+              <path d="m17.66 17.66 1.41 1.41" />
+              <path d="M2 12h2" />
+              <path d="M20 12h2" />
+              <path d="m6.34 17.66-1.41 1.41" />
+              <path d="m19.07 4.93-1.41 1.41" />
+            </svg>
+            <span class="theme-label">Dark</span>
+          </button>
+
+          <button
+            id="menu-toggle"
+            class="menu-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="nav-drawer"
+            aria-label="Toggle navigation menu"
+          >
+            Menu
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main id="main-content" class="container">
+      <section id="hero-root" class="section hero-section" aria-label="Introduction"></section>
+
+      <section id="metrics-root" class="section metrics-section" aria-label="Key metrics"></section>
+
+      <section id="work" class="section" aria-labelledby="work-heading">
+        <div class="section-header">
+          <div>
+            <h2 id="work-heading" class="section-title">Selected systems</h2>
+            <p class="section-subtitle">
+              Production AI platforms, telemetry pipelines, and research systems.
+            </p>
+          </div>
+          <div
+            id="work-filters"
+            class="filter-bar"
+            role="group"
+            aria-label="Filter projects by category"
+          ></div>
+        </div>
+        <p id="filter-status" class="sr-only" role="status" aria-live="polite"></p>
+        <div id="projects-root"></div>
+      </section>
+
+      <section id="research" class="section" aria-labelledby="research-heading">
+        <div class="section-header">
+          <div>
+            <h2 id="research-heading" class="section-title">Research and publications</h2>
+            <p class="section-subtitle">MSc research and peer-reviewed publications in 2026.</p>
+          </div>
+        </div>
+        <div id="research-root"></div>
+      </section>
+
+      <section id="experience" class="section" aria-labelledby="experience-heading">
+        <div class="section-header">
+          <div>
+            <h2 id="experience-heading" class="section-title">Experience</h2>
+            <p class="section-subtitle">
+              Industry engineering across AI platforms, QA automation, and RPA.
+            </p>
+          </div>
+        </div>
+        <div id="experience-root"></div>
+      </section>
+
+      <section id="credentials" class="section" aria-labelledby="credentials-heading">
+        <div class="section-header">
+          <div>
+            <h2 id="credentials-heading" class="section-title">Education and credentials</h2>
+            <p class="section-subtitle">
+              Academic degrees, technical stack, languages, honors, and certifications.
+            </p>
+          </div>
+        </div>
+        <div id="credentials-root"></div>
+      </section>
+
+      <section id="contact" class="section contact-section" aria-label="Contact">
+        <div id="contact-root"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <span>Lucas Maciel · Recife, PE, Brazil</span>
+        <span>Built with zero-build HTML, CSS, and ES modules</span>
+      </div>
+    </footer>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
