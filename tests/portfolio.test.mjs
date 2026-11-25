@@ -1,12 +1,14 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { PROFILE, PROJECT_CATEGORIES } from '../src/data/profile.js';
+import { readdirSync, readFileSync } from 'node:fs';
 import {
-  escapeHtml,
-  renderPortfolio,
-  renderProjects,
-} from '../src/render.js';
+  PROFILE,
+  PROJECT_CATEGORIES,
+  filterProjects,
+  getCategoryLabel,
+  normalizeCategory,
+  sanitizeUrl,
+} from '../src/data/profile.ts';
 
 const FORBIDDEN_SLOP = [
   '—',
@@ -37,8 +39,10 @@ function collectStrings(value) {
   return [];
 }
 
-function countProjectCards(html) {
-  return (html.match(/class="card project-card"/g) ?? []).length;
+function listTsxFiles(dirUrl) {
+  return readdirSync(dirUrl)
+    .filter((name) => name.endsWith('.tsx'))
+    .map((name) => new URL(name, dirUrl));
 }
 
 describe('PROFILE data model', () => {
@@ -99,87 +103,83 @@ describe('PROFILE data model', () => {
   });
 });
 
-describe('Portfolio renderer', () => {
-  it('escapes HTML special characters and rejects unsafe URLs', () => {
-    const escaped = escapeHtml(`<script>alert("xss")</script> & 'quote'`);
-    assert.equal(
-      escaped,
-      '&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt; &amp; &#39;quote&#39;'
+describe('Portfolio helpers', () => {
+  it('sanitizes URLs to allow only safe protocols and relative routes', () => {
+    assert.equal(sanitizeUrl('https://github.com/LucasMacieel'), 'https://github.com/LucasMacieel');
+    assert.equal(sanitizeUrl('http://example.com'), 'http://example.com');
+    assert.equal(sanitizeUrl('mailto:lucasmacieelsousa@gmail.com'), 'mailto:lucasmacieelsousa@gmail.com');
+    assert.equal(sanitizeUrl('#work'), '#work');
+    assert.equal(sanitizeUrl('/'), '/');
+    assert.equal(sanitizeUrl('/projects'), '/projects');
+
+    assert.equal(sanitizeUrl('javascript:alert(1)'), '#');
+    assert.equal(sanitizeUrl('data:text/html,<script>alert(1)</script>'), '#');
+    assert.equal(sanitizeUrl('//evil.example.com'), '#');
+    assert.equal(sanitizeUrl(''), '#');
+  });
+
+  it('normalizes categories and falls back to all for unknown values', () => {
+    assert.equal(normalizeCategory('all'), 'all');
+    assert.equal(normalizeCategory('ai'), 'ai');
+    assert.equal(normalizeCategory('systems'), 'systems');
+    assert.equal(normalizeCategory('research'), 'research');
+    assert.equal(normalizeCategory('unknown'), 'all');
+    assert.equal(normalizeCategory(''), 'all');
+  });
+
+  it('filters projects across all categories and unknown fallback', () => {
+    assert.equal(filterProjects(PROFILE.projects, 'all').length, 6);
+
+    const aiProjects = filterProjects(PROFILE.projects, 'ai');
+    assert.deepEqual(
+      aiProjects.map((p) => p.title),
+      [
+        'Enterprise AI Agent',
+        'Jira AI Summarization & Smart Digests',
+        'Semantic Test-Case Recommender',
+      ]
     );
 
-    const maliciousProfile = {
-      ...PROFILE,
-      name: '<img src=x onerror=alert(1)>',
-      links: {
-        github: 'javascript:alert(1)',
-        linkedin: 'https://www.linkedin.com/in/lucas-macieel',
-      },
-    };
-    const html = renderPortfolio(maliciousProfile);
-    assert.ok(!html.includes('<img src=x'));
-    assert.ok(!html.includes('javascript:alert(1)'));
-    assert.ok(html.includes('&lt;img src=x onerror=alert(1)&gt;'));
+    const systemsProjects = filterProjects(PROFILE.projects, 'systems');
+    assert.deepEqual(
+      systemsProjects.map((p) => p.title),
+      ['Antigravity Telemetry Plugin', 'Goji.AI Enterprise Platform']
+    );
+
+    const researchProjects = filterProjects(PROFILE.projects, 'research');
+    assert.deepEqual(
+      researchProjects.map((p) => p.title),
+      ['In-Context Learning for Per-Instance Algorithm Selection']
+    );
+
+    assert.equal(filterProjects(PROFILE.projects, 'unknown').length, 6);
+    assert.equal(getCategoryLabel('ai'), 'AI & Agents');
+    assert.equal(getCategoryLabel('systems'), 'Systems & Web');
+    assert.equal(getCategoryLabel('research'), 'Research');
   });
+});
 
-  it('filters projects by category using PROJECT_CATEGORIES and falls back on unknown categories', () => {
-    assert.equal(countProjectCards(renderProjects(PROFILE.projects, 'all')), 6);
+describe('App Router TSX components', () => {
+  it('keeps all TSX files in src/app and src/components free of forbidden dashes and AI slop vocabulary', () => {
+    const files = [
+      ...listTsxFiles(new URL('../src/app/', import.meta.url)),
+      ...listTsxFiles(new URL('../src/components/', import.meta.url)),
+    ];
+    assert.ok(files.length > 0);
 
-    const aiHtml = renderProjects(PROFILE.projects, 'ai');
-    assert.equal(countProjectCards(aiHtml), 3);
-    assert.ok(aiHtml.includes('Enterprise AI Agent'));
-    assert.ok(aiHtml.includes('Jira AI Summarization &amp; Smart Digests'));
-    assert.ok(aiHtml.includes('Semantic Test-Case Recommender'));
-    assert.ok(!aiHtml.includes('Goji.AI Enterprise Platform'));
-
-    const systemsHtml = renderProjects(PROFILE.projects, 'systems');
-    assert.equal(countProjectCards(systemsHtml), 2);
-    assert.ok(systemsHtml.includes('Antigravity Telemetry Plugin'));
-    assert.ok(systemsHtml.includes('Goji.AI Enterprise Platform'));
-    assert.ok(!systemsHtml.includes('Enterprise AI Agent'));
-
-    const researchHtml = renderProjects(PROFILE.projects, 'research');
-    assert.equal(countProjectCards(researchHtml), 1);
-    assert.ok(researchHtml.includes('In-Context Learning for Per-Instance Algorithm Selection'));
-
-    assert.equal(countProjectCards(renderProjects(PROFILE.projects, 'unknown')), 6);
-  });
-
-  it('renders every major section, metric, publication, role, and credential cleanly', () => {
-    const html = renderPortfolio(PROFILE);
-
-    for (const expected of [
-      'Lucas Maciel',
-      'Recife, PE, Brazil',
-      '~93%',
-      '84.3k+',
-      '27.5k+',
-      'CISTI 2026',
-      'ENIAC 2026',
-      'A Memetic Algorithm for User Fairness in Recommender Systems',
-      'Driver Drowsiness Detection Using Computer Vision with Adaptive Methods on Android',
-      'Projeto CIn/Motorola',
-      'Outlier',
-      'IT POWER SOFTWARE',
-      'MSc in Computer Science',
-      'B.Eng. in Computer Engineering',
-      'Destaque do Ano (2x)',
-      'EF SET English Certificate (C2 Proficient)',
-      'lucasmacieelsousa@gmail.com',
-    ]) {
-      assert.ok(html.includes(expected), `rendered output missing "${expected}"`);
-    }
-
-    assert.ok(!html.includes('99907'), 'rendered output must not expose phone number');
-  });
-
-  it('keeps static HTML shell free of forbidden dashes and AI slop vocabulary', () => {
-    const indexHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-    for (const pattern of FORBIDDEN_SLOP) {
-      if (typeof pattern === 'string') {
-        assert.ok(!indexHtml.includes(pattern), `forbidden character "${pattern}" in index.html`);
-      } else {
-        assert.ok(!pattern.test(indexHtml), `forbidden word ${pattern} in index.html`);
+    for (const fileUrl of files) {
+      const content = readFileSync(fileUrl, 'utf8');
+      for (const pattern of FORBIDDEN_SLOP) {
+        if (typeof pattern === 'string') {
+          assert.ok(
+            !content.includes(pattern),
+            `forbidden character "${pattern}" in ${fileUrl.pathname}`
+          );
+        } else {
+          assert.ok(!pattern.test(content), `forbidden word ${pattern} in ${fileUrl.pathname}`);
+        }
       }
+      assert.ok(!/\s-\s/.test(content), `hyphen used as dash in ${fileUrl.pathname}`);
     }
   });
 });

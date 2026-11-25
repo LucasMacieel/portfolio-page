@@ -1,97 +1,127 @@
-/**
- * @typedef {Object} ProjectCategory
- * @property {'all' | 'ai' | 'systems' | 'research'} id
- * @property {string} label
- */
+export type ProjectCategoryId = 'all' | 'ai' | 'systems' | 'research';
 
-/**
- * @typedef {Object} MetricItem
- * @property {string} value
- * @property {string} label
- * @property {string} detail
- */
+export type ProjectItemCategory = Exclude<ProjectCategoryId, 'all'>;
 
-/**
- * @typedef {Object} ProjectItem
- * @property {string} id
- * @property {'ai' | 'systems' | 'research'} category
- * @property {string} title
- * @property {string} role
- * @property {string} summary
- * @property {string} impact
- * @property {readonly string[]} stack
- */
+export interface ProjectCategory {
+  readonly id: ProjectCategoryId;
+  readonly label: string;
+}
 
-/**
- * @typedef {Object} ResearchItem
- * @property {string} id
- * @property {string} type
- * @property {string} status
- * @property {string} venue
- * @property {string} year
- * @property {string} title
- * @property {string} area
- * @property {string} summary
- */
+export interface MetricItem {
+  readonly value: string;
+  readonly label: string;
+  readonly detail: string;
+}
 
-/**
- * @typedef {Object} ExperienceItem
- * @property {string} id
- * @property {string} company
- * @property {string} role
- * @property {string} period
- * @property {string} location
- * @property {readonly string[]} highlights
- */
+export interface ProjectItem {
+  readonly id: string;
+  readonly category: ProjectItemCategory;
+  readonly title: string;
+  readonly role: string;
+  readonly summary: string;
+  readonly impact: string;
+  readonly stack: readonly string[];
+}
 
-/**
- * @typedef {Object} EducationItem
- * @property {string} institution
- * @property {string} degree
- * @property {string} period
- */
+export interface ResearchItem {
+  readonly id: string;
+  readonly type: string;
+  readonly status: string;
+  readonly venue: string;
+  readonly year: string;
+  readonly title: string;
+  readonly area: string;
+  readonly summary: string;
+}
 
-/**
- * @typedef {Object} StackGroup
- * @property {string} label
- * @property {readonly string[]} items
- */
+export interface ExperienceItem {
+  readonly id: string;
+  readonly company: string;
+  readonly role: string;
+  readonly period: string;
+  readonly location: string;
+  readonly highlights: readonly string[];
+}
 
-/**
- * @typedef {Object} LanguageItem
- * @property {string} name
- * @property {string} level
- */
+export interface EducationItem {
+  readonly institution: string;
+  readonly degree: string;
+  readonly period: string;
+}
 
-/**
- * @typedef {Object} ProfileData
- * @property {string} name
- * @property {string} initials
- * @property {string} location
- * @property {string} email
- * @property {{ github: string, linkedin: string }} links
- * @property {string} headline
- * @property {string} summary
- * @property {readonly MetricItem[]} metrics
- * @property {readonly ProjectItem[]} projects
- * @property {readonly ResearchItem[]} research
- * @property {readonly ExperienceItem[]} experience
- * @property {readonly EducationItem[]} education
- * @property {readonly StackGroup[]} stack
- * @property {readonly LanguageItem[]} languages
- * @property {readonly string[]} honors
- * @property {readonly string[]} certifications
- */
+export interface StackGroup {
+  readonly label: string;
+  readonly items: readonly string[];
+}
 
-/** @type {readonly ProjectCategory[]} */
+export interface LanguageItem {
+  readonly name: string;
+  readonly level: string;
+}
+
+export interface ProfileData {
+  readonly name: string;
+  readonly initials: string;
+  readonly location: string;
+  readonly email: string;
+  readonly links: {
+    readonly github: string;
+    readonly linkedin: string;
+  };
+  readonly headline: string;
+  readonly summary: string;
+  readonly metrics: readonly MetricItem[];
+  readonly projects: readonly ProjectItem[];
+  readonly research: readonly ResearchItem[];
+  readonly experience: readonly ExperienceItem[];
+  readonly education: readonly EducationItem[];
+  readonly stack: readonly StackGroup[];
+  readonly languages: readonly LanguageItem[];
+  readonly honors: readonly string[];
+  readonly certifications: readonly string[];
+}
+
 export const PROJECT_CATEGORIES = Object.freeze([
   { id: 'all', label: 'All' },
   { id: 'ai', label: 'AI & Agents' },
   { id: 'systems', label: 'Systems & Web' },
   { id: 'research', label: 'Research' },
-]);
+] satisfies readonly ProjectCategory[]);
 
-/** @type {ProfileData} */
+const CATEGORY_LABEL_MAP = new Map<ProjectCategoryId, string>(
+  PROJECT_CATEGORIES.map((category) => [category.id, category.label])
+);
+
+export function isProjectCategoryId(value: string): value is ProjectCategoryId {
+  return PROJECT_CATEGORIES.some((category) => category.id === value);
+}
+
+export function normalizeCategory(activeCategory: string): ProjectCategoryId {
+  return isProjectCategoryId(activeCategory) ? activeCategory : 'all';
+}
+
+export function filterProjects(
+  projects: readonly ProjectItem[],
+  activeCategory: string
+): readonly ProjectItem[] {
+  const current = normalizeCategory(activeCategory);
+  return current === 'all'
+    ? projects
+    : projects.filter((project) => project.category === current);
+}
+
+export function getCategoryLabel(category: ProjectItemCategory): string {
+  return CATEGORY_LABEL_MAP.get(category) ?? category;
+}
+
+export function sanitizeUrl(url: string): string {
+  const trimmed = url.trim();
+  if (/^(https?:\/\/|mailto:|#|\/(?!\/))/i.test(trimmed)) {
+    return trimmed;
+  }
+  return '#';
+}
+
 export const PROFILE = Object.freeze({
   name: 'Lucas Maciel',
   initials: 'LM',
@@ -136,7 +166,14 @@ export const PROFILE = Object.freeze({
       summary:
         'Built an AI agent with Google ADK integrating BigQuery, Google Docs, and Google Sheets with OAuth access control, deployed to GCP Agent Engine and Gemini Enterprise.',
       impact: 'OAuth-scoped enterprise tool execution across Google Workspace and BigQuery.',
-      stack: Object.freeze(['Google ADK', 'BigQuery', 'Google Docs & Sheets', 'OAuth', 'GCP Agent Engine', 'Gemini Enterprise']),
+      stack: Object.freeze([
+        'Google ADK',
+        'BigQuery',
+        'Google Docs & Sheets',
+        'OAuth',
+        'GCP Agent Engine',
+        'Gemini Enterprise',
+      ]),
     },
     {
       id: 'antigravity-telemetry-plugin',
@@ -165,7 +202,8 @@ export const PROFILE = Object.freeze({
       role: 'Projeto CIn/Motorola',
       summary:
         'Connected BigQuery and Vertex AI LLMs in Jira to power issue summarization and automated notification digests that retrieve, summarize, and surface relevant issue updates.',
-      impact: '84.3k+ summarization requests saving 4.6k+ hrs for 400 monthly users, plus 27.5k+ digests to 427 subscribers.',
+      impact:
+        '84.3k+ summarization requests saving 4.6k+ hrs for 400 monthly users, plus 27.5k+ digests to 427 subscribers.',
       stack: Object.freeze(['Vertex AI', 'BigQuery', 'Jira', 'LLMs']),
     },
     {
@@ -343,4 +381,4 @@ export const PROFILE = Object.freeze({
     'Hackathon 2023',
     'Curso Completo de Linguagem C e C++',
   ]),
-});
+} satisfies ProfileData);
