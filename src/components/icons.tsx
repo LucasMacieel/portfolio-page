@@ -1,3 +1,46 @@
+export function BrandMark() {
+  return (
+    <svg viewBox="0 0 32 32" width={32} height={32} aria-hidden="true">
+      <rect
+        className="brand-mark-frame"
+        x={1}
+        y={1}
+        width={30}
+        height={30}
+        rx={6}
+        fill="var(--surface-subtle)"
+        stroke="var(--border-strong)"
+        strokeWidth={1.25}
+      />
+      <path
+        d="M6.25 12.75 9.25 16 6.25 19.25"
+        fill="none"
+        stroke="var(--accent)"
+        strokeWidth={1.9}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M12 11.25V20.75H16"
+        fill="none"
+        stroke="var(--text)"
+        strokeWidth={1.9}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M18.5 20.75V11.25L22 16.25L25.5 11.25V20.75"
+        fill="none"
+        stroke="var(--text)"
+        strokeWidth={1.9}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx={26} cy={6.25} r={1.75} fill="var(--metric)" />
+    </svg>
+  );
+}
+
 export function GitHubIcon() {
   return (
     <svg viewBox="0 0 24 24" width={16} height={16} fill="currentColor" aria-hidden="true">

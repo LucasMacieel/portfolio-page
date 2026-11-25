@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { MoonIcon, SunIcon } from './icons';
+import { BrandMark, MoonIcon, SunIcon } from './icons';
 
 const THEME_STORAGE_KEY = 'portfolio-theme';
 const SECTION_IDS = ['work', 'research', 'experience', 'credentials', 'contact'] as const;
@@ -96,7 +96,7 @@ export function SiteHeader() {
       <div className="container header-inner">
         <a className="brand" href="#hero-root">
           <span className="brand-mark" aria-hidden="true">
-            LM
+            <BrandMark />
           </span>
           <span>Lucas Maciel</span>
         </a>
