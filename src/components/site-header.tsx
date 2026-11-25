@@ -2,9 +2,13 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { BrandMark, MoonIcon, SunIcon } from './icons';
+import { CONTAINER_CLASS } from './ui-classes';
 
 const THEME_STORAGE_KEY = 'portfolio-theme';
 const SECTION_IDS = ['work', 'research', 'experience', 'credentials', 'contact'] as const;
+
+const CONTROL_BUTTON_CLASS =
+  'cursor-pointer items-center gap-[0.45rem] rounded-sm border border-border bg-surface px-3 py-[0.42rem] font-mono text-[0.8125rem] transition-[border-color,background-color] duration-[140ms] ease-in-out hover:border-border-strong hover:bg-surface-subtle';
 
 const NAV_ITEMS = [
   { id: 'work', label: 'Systems' },
@@ -92,25 +96,37 @@ export function SiteHeader() {
   const isDark = theme === 'dark';
 
   return (
-    <header className="site-header">
-      <div className="container header-inner">
-        <a className="brand" href="#hero-root">
-          <span className="brand-mark" aria-hidden="true">
+    <header className="sticky top-0 z-40 border-b border-border bg-[color-mix(in_srgb,var(--bg)_88%,transparent)] backdrop-blur-[10px]">
+      <div className={`${CONTAINER_CLASS} flex min-h-16 items-center justify-between gap-4`}>
+        <a
+          className="group inline-flex items-center gap-3 font-bold tracking-[-0.02em]"
+          href="#hero-root"
+        >
+          <span
+            className="inline-grid h-8 w-8 shrink-0 place-items-center rounded-sm shadow-sm transition-[transform,box-shadow] duration-150 ease-in-out group-hover:-translate-y-px group-hover:shadow-md"
+            aria-hidden="true"
+          >
             <BrandMark />
           </span>
           <span>Lucas Maciel</span>
         </a>
 
-        <div className="header-controls">
+        <div className="flex items-center gap-3">
           <nav
             id="nav-drawer"
-            className={mobileMenuOpen ? 'site-nav is-open' : 'site-nav'}
+            className={`flex items-center gap-2 max-[720px]:absolute max-[720px]:inset-x-0 max-[720px]:top-full max-[720px]:flex-col max-[720px]:items-stretch max-[720px]:border-b max-[720px]:border-border max-[720px]:bg-bg max-[720px]:px-4 max-[720px]:pt-3 max-[720px]:pb-4 max-[720px]:shadow-md ${
+              mobileMenuOpen ? 'max-[720px]:flex' : 'max-[720px]:hidden'
+            }`}
             aria-label="Primary navigation"
           >
             {NAV_ITEMS.map((item) => (
               <a
                 key={item.id}
-                className={activeSection === item.id ? 'nav-link is-active' : 'nav-link'}
+                className={`rounded-sm px-[0.65rem] py-[0.4rem] text-[0.9375rem] font-medium transition-[color,background-color] duration-[140ms] ease-in-out max-[720px]:px-3 max-[720px]:py-[0.6rem] ${
+                  activeSection === item.id
+                    ? 'bg-surface-subtle text-accent'
+                    : 'text-text-muted hover:bg-surface-subtle hover:text-text'
+                }`}
                 href={`#${item.id}`}
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -121,7 +137,7 @@ export function SiteHeader() {
 
           <button
             id="theme-toggle"
-            className="theme-toggle"
+            className={`inline-flex ${CONTROL_BUTTON_CLASS}`}
             type="button"
             aria-pressed={isDark}
             aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
@@ -129,13 +145,13 @@ export function SiteHeader() {
           >
             <MoonIcon />
             <SunIcon />
-            <span className="theme-label">{isDark ? 'Light' : 'Dark'}</span>
+            <span>{isDark ? 'Light' : 'Dark'}</span>
           </button>
 
           <button
             ref={menuButtonRef}
             id="menu-toggle"
-            className="menu-toggle"
+            className={`hidden max-[720px]:inline-flex ${CONTROL_BUTTON_CLASS}`}
             type="button"
             aria-expanded={mobileMenuOpen}
             aria-controls="nav-drawer"

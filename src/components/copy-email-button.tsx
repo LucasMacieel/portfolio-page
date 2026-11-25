@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { CopyIcon } from './icons';
+import { BUTTON_CLASSES } from './ui-classes';
 
 interface CopyEmailButtonProps {
   readonly email: string;
@@ -65,12 +66,12 @@ export function CopyEmailButton({ email }: CopyEmailButtonProps) {
     <>
       <button
         type="button"
-        className="button button-secondary"
+        className={BUTTON_CLASSES.secondary}
         data-copy-email={email}
         onClick={handleCopy}
       >
         <CopyIcon />
-        <span className="copy-label">{copied ? 'Copied' : 'Copy email'}</span>
+        <span>{copied ? 'Copied' : 'Copy email'}</span>
       </button>
       <p id="copy-status" className="sr-only" role="status" aria-live="polite">
         {statusMessage}

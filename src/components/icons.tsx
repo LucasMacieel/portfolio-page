@@ -1,8 +1,8 @@
 export function BrandMark() {
   return (
-    <svg viewBox="0 0 32 32" width={32} height={32} aria-hidden="true">
+    <svg className="block" viewBox="0 0 32 32" width={32} height={32} aria-hidden="true">
       <rect
-        className="brand-mark-frame"
+        className="transition-[stroke] duration-150 ease-in-out group-hover:stroke-accent"
         x={1}
         y={1}
         width={30}
@@ -116,7 +116,7 @@ export function ArrowUpRightIcon() {
 export function MoonIcon() {
   return (
     <svg
-      className="icon-moon"
+      className="inline-block dark:hidden"
       viewBox="0 0 24 24"
       width={15}
       height={15}
@@ -135,7 +135,7 @@ export function MoonIcon() {
 export function SunIcon() {
   return (
     <svg
-      className="icon-sun"
+      className="hidden dark:inline-block"
       viewBox="0 0 24 24"
       width={15}
       height={15}
